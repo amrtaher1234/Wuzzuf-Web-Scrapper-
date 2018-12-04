@@ -25,11 +25,12 @@ function delay(num){
 }
 
 class Job{
-  constructor(title , salary , company , url ){
+  constructor(title , salary , company , url , imgURL ){
     this.title = title ; 
     this.company = company ; 
     this.salary = salary ; 
     this.url = url ;
+    this.imgURL = imgURL; 
   }
 }
 
@@ -61,12 +62,12 @@ class Job{
 
 
   // to scroll down to fetch more jobs in the screen 
-//   for(let i =0; i<declarations.settings.ScrollLimit; i++){
-//   await page.evaluate(_ => {
-//     window.scrollBy(0, window.innerHeight);
-//   });
-//   await delay(1500); 
-// }
+  for(let i =0; i<declarations.settings.ScrollLimit; i++){
+  await page.evaluate(_ => {
+    window.scrollBy(0, window.innerHeight);
+  });
+  await delay(1500); 
+}
 
 
   // fetch all links to jobs in the page
@@ -82,10 +83,12 @@ class Job{
   // fetch salaries and other data of each job fetched above
   for(let i = 0; i<hrefs.length ; i++){
   Promises.push(browser.newPage().then(async page => {
-    await page.goto(hrefs[i]);
+    await page.goto(hrefs[i] , {
+      timeout: 3000000
+    });
     const salary = await page.waitFor('.job-page .job-summary .salary-info dd')
     const text = await (await salary.getProperty('textContent')).jsonValue();
-    if(text.trim() !='Confidential'){
+    if(text.trim() !='Confidential' && !text.includes('Confidential')){
       const jobTitle = await page.waitFor('h1.job-title'); 
       const jobTitleText = await (await jobTitle.getProperty('textContent')).jsonValue(); 
 
@@ -93,7 +96,10 @@ class Job{
       const companyNameText = await (await companyName.getProperty("textContent")).jsonValue(); 
       const trimmedCompanyNameText = companyNameText.replace(/(\r\n\t|\n|\r\t)/gm,"");
 
-      let job = new Job(jobTitleText.trim() , text.trim() , trimmedCompanyNameText.trim() , hrefs[i]);
+      const companyLogo = await page.waitFor('a.company-logo img'); 
+      const companyLogoURL = await (await companyLogo.getProperty('src')).jsonValue(); 
+
+      let job = new Job(jobTitleText.trim() , text.trim() , trimmedCompanyNameText.trim() , hrefs[i] , companyLogoURL);
       Jobs.push(job); 
     }
   }))
@@ -109,11 +115,12 @@ class Job{
       title : job.title , 
       company : job.company,
       url : job.url,
+      imgURL : job.imgURL,
     }
     firebasePromises.push(firestore.collection("Jobs").add(JobObject));
   })
   await Promise.all(firebasePromises); 
-  console.log("promise dot all is fullfiled"); 
+  console.log("FINISHED CRAWLING AND UPDATED DATABASE"); 
 
   // closing the browser and ending the application
   await browser.close(); 
