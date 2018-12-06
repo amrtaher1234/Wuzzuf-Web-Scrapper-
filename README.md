@@ -12,7 +12,7 @@ hello everyone, this is a simple crawler to fetch jobs that includes salary rang
 ## running guides:
 
 - in order to have this crawler work for you, you need to pass your wuzzuf.com credentials in the credentials.json file. There is an object there to fill your email and password, you can trace the code there is no actual capturing of the json data or any sort of saving such data to any sort of database.
-- after doing that you can credentials to your database repo and do not forget to enable firstore in that repo as the code saves data to it.
+- after doing that you can add credentials to your database repo in firebaseConfig.json and do not forget to enable firstore in that repo as the code saves data to it.
 - in the cmd type ``` node ./index.js ```, this will open a chromium application and it will start crawling the website, it will take 1-3 minutes to fetch the data.
 
 
