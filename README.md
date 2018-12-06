@@ -1,6 +1,7 @@
 # Wuzzuf Scraper
 
-hello everyone, this is a simple crawler to fetch jobs that includes salary ranges, using this is fairly simple.
+- hello everyone, this is a simple crawler to fetch jobs that includes salary ranges, using this is fairly simple.
+- (https://www.linkedin.com/feed/update/urn:li:activity:6475722957569163266)[Link to Demo] 
 
 ## installation guides: 
 
