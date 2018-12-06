@@ -41,7 +41,7 @@ class Job{
   // launching the chrome browser
 
   const browser = await puppeteer.launch(
-    {executablePath:"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" , headless : true})
+    {headless : true})
   const page = await browser.newPage()
   await page.setViewport({ width: 1280, height: 800 })
   await page.goto('https://wuzzuf.net/explore')
@@ -86,19 +86,25 @@ class Job{
     await page.goto(hrefs[i] , {
       timeout: 3000000
     });
+    // salary fetching
     const salary = await page.waitFor('.job-page .job-summary .salary-info dd')
     const text = await (await salary.getProperty('textContent')).jsonValue();
     if(text.trim() !='Confidential' && !text.includes('Confidential')){
+
+      // job title 
       const jobTitle = await page.waitFor('h1.job-title'); 
       const jobTitleText = await (await jobTitle.getProperty('textContent')).jsonValue(); 
 
+      // company name
       const companyName = await page.waitFor('p.job-subinfo'); 
       const companyNameText = await (await companyName.getProperty("textContent")).jsonValue(); 
       const trimmedCompanyNameText = companyNameText.replace(/(\r\n\t|\n|\r\t)/gm,"");
 
+      // logo url 
       const companyLogo = await page.waitFor('a.company-logo img'); 
       const companyLogoURL = await (await companyLogo.getProperty('src')).jsonValue(); 
 
+      // constructing a new Job object and pushing it to an array of jobs.
       let job = new Job(jobTitleText.trim() , text.trim() , trimmedCompanyNameText.trim() , hrefs[i] , companyLogoURL);
       Jobs.push(job); 
     }
@@ -106,6 +112,7 @@ class Job{
 }
   await Promise.all(Promises); 
 
+  savingData(Jobs);
 
   // pushing newest jobs to firebase
   const firebasePromises = []; 
@@ -126,3 +133,14 @@ class Job{
   await browser.close(); 
 
 })()
+
+
+
+function savingData(Data){
+// just consoling the data.
+  Data.forEach(job =>{
+    console.log(job.url); 
+  })
+  // TODO: implement your own way of saving the jobs, maybe send it to a firebase repo like i do or
+  // send it to your own website as an rest api or to a database
+}

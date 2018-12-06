@@ -1,0 +1,8 @@
+{
+    "apiKey": "your data of your repo goes here",
+    "authDomain": "**",
+    "databaseURL": "**",
+    "projectId": "**",
+    "storageBucket": "",
+    "messagingSenderId": "**"
+}
